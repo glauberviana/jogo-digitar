@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Runner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="stats-bar">
+            <div id="score-container">Pontuação: <span id="score">0</span></div>
+            <div id="lives-container">Vidas: <span id="lives">❤️❤️❤️</span></div>
+        </div>
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        <div id="ui-container">
+            <h2 id="wordToTypeLabel">Digite a palavra para eliminar o obstáculo:</h2>
+            <input type="text" id="wordInput" placeholder="Digite aqui..." autofocus>
+        </div>
+    </div>
+
+    <div id="gameOverScreen" style="display: none;">
+        <h2>Fim de Jogo!</h2>
+        <p>Sua pontuação final foi: <span id="finalScore"></span></p>
+        <button id="restartButton">Jogar Novamente</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

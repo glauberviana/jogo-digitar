@@ -1,0 +1,82 @@
+body {
+    background-color: #333;
+    color: #fff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    text-align: center;
+}
+
+#game-container {
+    border: 2px solid #fff;
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #222;
+}
+
+#stats-bar {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+#lives-container {
+    color: #ff4757; /* Vermelho para os corações */
+}
+
+canvas {
+    background: linear-gradient(to bottom, #87CEEB 0%, #a0d8ef 70%, #2E8B57 70%, #2E8B57 100%);
+    display: block;
+    border-radius: 5px;
+}
+
+#ui-container {
+    margin-top: 15px;
+}
+
+#wordToTypeLabel {
+    margin: 0 0 10px 0;
+    font-weight: normal;
+    color: #ccc;
+}
+
+#wordInput {
+    padding: 10px;
+    font-size: 1.5em;
+    width: 50%;
+    text-align: center;
+    border: 2px solid #87CEEB;
+    border-radius: 5px;
+    background-color: #444;
+    color: #fff;
+}
+
+#gameOverScreen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.85);
+    padding: 40px;
+    border-radius: 10px;
+    border: 2px solid #fff;
+}
+
+button {
+    padding: 15px 30px;
+    font-size: 1.2em;
+    cursor: pointer;
+    background-color: #87CEEB;
+    border: none;
+    border-radius: 5px;
+    color: #111;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #a0d8ef;
+}
