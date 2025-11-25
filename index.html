@@ -3,26 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Word Runner</title>
+    <title>KeyMaster Kids - Aprenda a Digitar</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="game-container">
-        <div id="stats-bar">
-            <div id="score-container">Pontuação: <span id="score">0</span></div>
-            <div id="lives-container">Vidas: <span id="lives">❤️❤️❤️</span></div>
+    <!-- Menu Principal -->
+    <div id="menuScreen" class="menu-screen">
+        <h1>🎮 KeyMaster Kids</h1>
+        <p class="subtitle">Aprenda a digitar brincando!</p>
+        <p style="color: #999; margin-bottom: 30px;">Escolha seu nível de dificuldade</p>
+        <div class="difficulty-buttons">
+            <button class="difficulty-btn easy" onclick="startGame('easy')">
+                ⭐ Fácil
+            </button>
+            <button class="difficulty-btn medium" onclick="startGame('medium')">
+                ⭐⭐ Médio
+            </button>
+            <button class="difficulty-btn hard" onclick="startGame('hard')">
+                ⭐⭐⭐ Difícil
+            </button>
         </div>
-        <canvas id="gameCanvas" width="800" height="400"></canvas>
-        <div id="ui-container">
-            <h2 id="wordToTypeLabel">Digite a palavra para eliminar o obstáculo:</h2>
-            <input type="text" id="wordInput" placeholder="Digite aqui..." autofocus>
-        </div>
+        <p style="color: #999; font-size: 0.9em; margin-top: 20px;">
+            💡 Dica: Comece no nível Fácil para aprender!
+        </p>
     </div>
 
-    <div id="gameOverScreen" style="display: none;">
-        <h2>Fim de Jogo!</h2>
-        <p>Sua pontuação final foi: <span id="finalScore"></span></p>
-        <button id="restartButton">Jogar Novamente</button>
+    <!-- Tela do Jogo -->
+    <div id="gameContainer" class="game-container">
+        <div class="stats-bar">
+            <div class="stat">
+                Pontuação
+                <span id="score">0</span>
+            </div>
+            <div class="stat">
+                Palavras Corretas
+                <span id="wordsCorrect">0</span>
+            </div>
+            <div class="stat lives">
+                Vidas
+                <span id="lives">❤️❤️❤️</span>
+            </div>
+            <div class="stat">
+                Nível
+                <span id="difficulty" style="color: #FF9800;">Médio</span>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="hint-text" id="hintText"></div>
+
+        <p style="text-align: center; color: #666; margin-bottom: 15px;">
+            <strong>📝 Digite a palavra abaixo:</strong>
+        </p>
+
+        <div class="word-display" id="wordDisplay">palavra</div>
+
+        <div class="input-section">
+            <input 
+                type="text" 
+                id="wordInput" 
+                placeholder="Digite aqui e pressione Enter..." 
+                autocomplete="off"
+            >
+            <button class="hint-btn" id="hintBtn" onclick="showHint()">💡 Dica</button>
+        </div>
+
+        <p style="text-align: center; color: #666; font-size: 0.95em;">
+            <span id="wordCount">0</span> palavras digitadas • <span id="accuracy">0</span>% de precisão
+        </p>
+    </div>
+
+    <!-- Tela de Fim de Jogo -->
+    <div id="overlay" class="overlay"></div>
+    <div id="gameOverScreen" class="game-over-screen">
+        <h2>🎉 Parabéns!</h2>
+        <p style="color: #666; font-size: 1.1em; margin-bottom: 20px;">Você completou o jogo!</p>
+
+        <div class="final-stats">
+            <p>Pontuação Final: <span class="final-score" id="finalScore">0</span></p>
+            <p>Palavras Digitadas: <span id="finalWordsCorrect">0</span></p>
+            <p>Precisão: <span class="accuracy" id="finalAccuracy">0</span>%</p>
+            <p>Tempo: <span id="finalTime">0</span>s</p>
+        </div>
+
+        <div class="end-buttons">
+            <button class="btn btn-restart" onclick="location.reload()">Jogar Novamente</button>
+            <button class="btn btn-menu" onclick="location.reload()">Voltar ao Menu</button>
+        </div>
     </div>
 
     <script src="script.js"></script>

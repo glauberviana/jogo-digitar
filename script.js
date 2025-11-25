@@ -1,206 +1,165 @@
-// --- SELEÇÃO DOS ELEMENTOS DO DOM ---
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-const scoreElement = document.getElementById('score');
-const livesElement = document.getElementById('lives');
-const wordInputElement = document.getElementById('wordInput');
-const gameOverScreen = document.getElementById('gameOverScreen');
-const finalScoreElement = document.getElementById('finalScore');
-const restartButton = document.getElementById('restartButton');
-const gameContainer = document.getElementById('game-container');
+// ===== CONFIGURAÇÕES =====
+const wordLists = {
+    easy: ["gato", "sol", "lua", "pão", "rua", "via", "par", "sim", "não", "cor", "flor", "tudo"],
+    medium: ["python", "javascript", "computador", "teclado", "mouse", "escola", "livro", "caneta", "professora", "amigo", "diversão", "tecnologia"],
+    hard: ["programação", "inteligência", "criatividade", "estratégia", "desenvolvimento", "conhecimento", "responsabilidade", "dedicação", "persistência", "excelência"]
+};
 
-// --- CONFIGURAÇÕES E VARIÁVEIS GLOBAIS ---
-const wordList = ["rapido", "terra", "vento", "fogo", "agua", "magia", "forca", "escudo", "luz", "sombra", "jogo", "vida"];
-let player, obstacles, score, lives, gameSpeed, gameOver, lastScoreThreshold;
+const levelConfig = {
+    easy: { timeLimit: 120, initialLives: 5, baseSpeed: 60 },
+    medium: { timeLimit: 100, initialLives: 4, baseSpeed: 40 },
+    hard: { timeLimit: 80, initialLives: 3, baseSpeed: 30 }
+};
 
-// --- CLASSES DO JOGO ---
+// ===== VARIÁVEIS GLOBAIS =====
+let currentDifficulty = 'medium';
+let currentWord = '';
+let score = 0;
+let wordsCorrect = 0;
+let totalAttempts = 0;
+let lives = 3;
+let gameActive = false;
+let timeRemaining = 0;
+let startTime = 0;
+let hintUsed = false;
 
-// Classe para o Personagem (atualmente visual, sem muita lógica)
-class Player {
-    constructor(x, y, width, height, color) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.color = color;
-    }
+// ===== FUNÇÕES PRINCIPAIS =====
 
-    draw() {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-    }
-}
-
-// Classe para os Obstáculos
-class Obstacle {
-    constructor(word) {
-        this.x = canvas.width;
-        this.y = canvas.height - 50; // Altura do chão
-        this.width = 40;
-        this.height = 50;
-        this.color = '#CD5C5C'; // IndianRed
-        this.word = word;
-    }
-
-    draw() {
-        // Desenha o obstáculo
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-
-        // Desenha a palavra acima
-        ctx.fillStyle = 'white';
-        ctx.font = '22px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(this.word, this.x + this.width / 2, this.y - 15);
-    }
-
-    update() {
-        this.x -= gameSpeed;
-    }
-}
-
-
-// --- FUNÇÕES DE ÁUDIO (PLACEHOLDERS) ---
-function playSuccessSound() {
-    console.log("Efeito sonoro: Sucesso!");
-    // Futuramente, adicione aqui o código para tocar um som de sucesso.
-}
-
-function playCollisionSound() {
-    console.log("Efeito sonoro: Colisão!");
-    // Futuramente, adicione aqui o código para tocar um som de colisão.
-}
-
-
-// --- FUNÇÕES PRINCIPAIS DO JOGO ---
-
-function startGame() {
-    // Inicializa/Reseta as variáveis do jogo
-    player = new Player(100, canvas.height - 50, 40, 50, '#FDB813'); // Amarelo-laranja
-    obstacles = [];
+function startGame(difficulty) {
+    currentDifficulty = difficulty;
     score = 0;
-    lives = 3;
-    // A MUDANÇA ESTÁ AQUI!
-    gameSpeed = 2.5; // Estava 3. Um valor menor deixa o jogo mais lento.
-    gameOver = false;
-    lastScoreThreshold = 0;
+    wordsCorrect = 0;
+    totalAttempts = 0;
+    lives = levelConfig[difficulty].initialLives;
+    timeRemaining = levelConfig[difficulty].timeLimit;
+    gameActive = true;
+    hintUsed = false;
+    startTime = Date.now();
 
-    // Configura a UI
+    document.getElementById('menuScreen').style.display = 'none';
+    document.getElementById('gameContainer').classList.add('active');
+    document.getElementById('overlay').classList.remove('active');
+    document.getElementById('gameOverScreen').classList.remove('active');
+
+    updateDifficultyDisplay();
+    generateNewWord();
     updateUI();
-    gameOverScreen.style.display = 'none';
-    gameContainer.style.display = 'block';
-    wordInputElement.value = '';
-    wordInputElement.focus();
-
-    // Gera o primeiro obstáculo e inicia o loop
-    generateObstacle();
-    gameLoop();
+    document.getElementById('wordInput').focus();
+    startTimer();
 }
 
-function gameLoop() {
-    if (gameOver) return;
+function generateNewWord() {
+    const words = wordLists[currentDifficulty];
+    currentWord = words[Math.floor(Math.random() * words.length)];
+    document.getElementById('wordDisplay').textContent = currentWord;
+    document.getElementById('wordDisplay').className = 'word-display';
+    document.getElementById('wordInput').value = '';
+    document.getElementById('hintText').classList.remove('show');
+    document.getElementById('hintBtn').disabled = false;
+    hintUsed = false;
+}
 
-    // Limpa o canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+function handleInput(e) {
+    if (!gameActive || e.key !== 'Enter') return;
 
-    // Desenha o jogador
-    player.draw();
+    const userInput = e.target.value.trim().toLowerCase();
+    totalAttempts++;
 
-    // Atualiza e desenha os obstáculos
-    for (let i = obstacles.length - 1; i >= 0; i--) {
-        let obs = obstacles[i];
-        obs.update();
-        obs.draw();
-
-        // Checagem de colisão
-        if (obs.x < player.x + player.width) {
-            handleCollision(i); // Passa o índice do obstáculo
-            break; // Sai do loop para evitar múltiplas colisões no mesmo frame
+    if (userInput === currentWord.toLowerCase()) {
+        score += 10 * (currentDifficulty === 'easy' ? 1 : currentDifficulty === 'medium' ? 1.5 : 2);
+        wordsCorrect++;
+        showSuccess();
+        generateNewWord();
+    } else {
+        lives--;
+        showError();
+        if (lives <= 0) {
+            endGame();
+            return;
         }
     }
 
-    // Continua o loop na próxima animação
-    requestAnimationFrame(gameLoop);
-}
-
-function handleCollision(obstacleIndex) {
-    playCollisionSound();
-    lives--;
     updateUI();
-
-    // Remove o obstáculo com o qual colidiu
-    obstacles.splice(obstacleIndex, 1);
-    
-    if (lives <= 0) {
-        endGame();
-    } else {
-        // Gera um novo obstáculo para não deixar a tela vazia
-        generateObstacle();
-    }
+    e.target.value = '';
 }
 
-
-function generateObstacle() {
-    // Impede que obstáculos se sobreponham
-    const lastObstacle = obstacles[obstacles.length - 1];
-    if (!lastObstacle || (canvas.width - lastObstacle.x) > 300) { // Distância mínima entre obstáculos
-        const randomWord = wordList[Math.floor(Math.random() * wordList.length)];
-        obstacles.push(new Obstacle(randomWord));
-    }
-    // Agenda a próxima tentativa de geração
-    setTimeout(generateObstacle, Math.random() * 2000 + 1500); // Entre 1.5 e 3.5 segundos
+function showSuccess() {
+    const display = document.getElementById('wordDisplay');
+    display.classList.add('correct');
+    setTimeout(() => display.classList.remove('correct'), 500);
 }
 
+function showError() {
+    const display = document.getElementById('wordDisplay');
+    display.classList.add('incorrect');
+    setTimeout(() => display.classList.remove('incorrect'), 500);
+}
+
+function showHint() {
+    if (hintUsed) return;
+    hintUsed = true;
+    document.getElementById('hintBtn').disabled = true;
+
+    const word = currentWord;
+    const hintLength = Math.ceil(word.length / 2);
+    const hint = word.substring(0, hintLength) + '...';
+
+    const hintEl = document.getElementById('hintText');
+    hintEl.textContent = `💡 Dica: ${hint}`;
+    hintEl.classList.add('show');
+}
 
 function updateUI() {
-    scoreElement.textContent = score;
-    livesElement.textContent = '❤️'.repeat(lives);
+    document.getElementById('score').textContent = Math.floor(score);
+    document.getElementById('wordsCorrect').textContent = wordsCorrect;
+    document.getElementById('lives').textContent = '❤️'.repeat(Math.max(0, lives));
+    document.getElementById('wordCount').textContent = totalAttempts;
+
+    const accuracy = totalAttempts > 0 ? Math.round((wordsCorrect / totalAttempts) * 100) : 0;
+    document.getElementById('accuracy').textContent = accuracy;
+
+    const progress = (wordsCorrect / 20) * 100;
+    document.getElementById('progressFill').style.width = Math.min(progress, 100) + '%';
+}
+
+function updateDifficultyDisplay() {
+    const diffNames = { easy: '⭐ Fácil', medium: '⭐⭐ Médio', hard: '⭐⭐⭐ Difícil' };
+    document.getElementById('difficulty').textContent = diffNames[currentDifficulty];
+}
+
+function startTimer() {
+    const timerInterval = setInterval(() => {
+        if (!gameActive) {
+            clearInterval(timerInterval);
+            return;
+        }
+
+        timeRemaining--;
+
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            endGame();
+        }
+    }, 1000);
 }
 
 function endGame() {
-    gameOver = true;
-    finalScoreElement.textContent = score;
-    gameContainer.style.display = 'none';
-    gameOverScreen.style.display = 'block';
+    gameActive = false;
+    document.getElementById('gameContainer').classList.remove('active');
+    document.getElementById('overlay').classList.add('active');
+    document.getElementById('gameOverScreen').classList.add('active');
+
+    const accuracy = totalAttempts > 0 ? Math.round((wordsCorrect / totalAttempts) * 100) : 0;
+    const elapsedTime = Math.round((Date.now() - startTime) / 1000);
+
+    document.getElementById('finalScore').textContent = Math.floor(score);
+    document.getElementById('finalWordsCorrect').textContent = wordsCorrect;
+    document.getElementById('finalAccuracy').textContent = accuracy;
+    document.getElementById('finalTime').textContent = elapsedTime;
 }
 
+// ===== EVENT LISTENERS =====
+document.getElementById('wordInput').addEventListener('keypress', handleInput);
 
-// --- CONTROLE DE INPUT ---
-
-wordInputElement.addEventListener('input', (e) => {
-    const typedWord = e.target.value.trim().toLowerCase();
-    
-    // Se não houver obstáculos, não faça nada
-    if (obstacles.length === 0) return;
-
-    const targetWord = obstacles[0].word;
-    
-    if (typedWord === targetWord) {
-        playSuccessSound();
-        
-        // Remove o obstáculo eliminado
-        obstacles.shift();
-        
-        // Limpa o campo de input
-        e.target.value = '';
-        
-        // Atualiza a pontuação
-        score += 10;
-
-        // Aumenta a dificuldade
-        if (score >= lastScoreThreshold + 100) {
-            gameSpeed += 0.5;
-            lastScoreThreshold += 100;
-            console.log("Velocidade aumentada para: ", gameSpeed);
-        }
-
-        updateUI();
-    }
-});
-
-
-// --- EVENT LISTENERS ---
-restartButton.addEventListener('click', startGame);
-
-// --- INICIAR O JOGO ---
-startGame();
+// Inicia com menu visível
+document.getElementById('menuScreen').style.display = 'block';
