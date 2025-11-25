@@ -13,13 +13,13 @@
         <p class="subtitle">Aprenda a digitar brincando!</p>
         <p style="color: #999; margin-bottom: 30px;">Escolha seu nível de dificuldade</p>
         <div class="difficulty-buttons">
-            <button class="difficulty-btn easy" onclick="startGame('easy')">
+            <button class="difficulty-btn easy" onclick="startGame('easy')" aria-label="Iniciar jogo no nível Fácil">
                 ⭐ Fácil
             </button>
-            <button class="difficulty-btn medium" onclick="startGame('medium')">
+            <button class="difficulty-btn medium" onclick="startGame('medium')" aria-label="Iniciar jogo no nível Médio">
                 ⭐⭐ Médio
             </button>
-            <button class="difficulty-btn hard" onclick="startGame('hard')">
+            <button class="difficulty-btn hard" onclick="startGame('hard')" aria-label="Iniciar jogo no nível Difícil">
                 ⭐⭐⭐ Difícil
             </button>
         </div>
@@ -29,37 +29,41 @@
     </div>
 
     <!-- Tela do Jogo -->
-    <div id="gameContainer" class="game-container">
+    <div id="gameContainer" class="game-container" role="main" aria-label="Área de jogo">
         <div class="stats-bar">
             <div class="stat">
                 Pontuação
-                <span id="score">0</span>
+                <span id="score" aria-live="polite">0</span>
             </div>
             <div class="stat">
                 Palavras Corretas
-                <span id="wordsCorrect">0</span>
+                <span id="wordsCorrect" aria-live="polite">0</span>
             </div>
             <div class="stat lives">
                 Vidas
-                <span id="lives">❤️❤️❤️</span>
+                <span id="lives" aria-live="polite">❤️❤️❤️</span>
             </div>
             <div class="stat">
                 Nível
                 <span id="difficulty" style="color: #FF9800;">Médio</span>
             </div>
+            <div class="stat">
+                Tempo
+                <span id="timeDisplay" aria-live="polite">0:00</span>
+            </div>
         </div>
 
-        <div class="progress-bar">
+        <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
             <div class="progress-fill" id="progressFill"></div>
         </div>
 
-        <div class="hint-text" id="hintText"></div>
+        <div class="hint-text" id="hintText" role="status" aria-live="polite"></div>
 
         <p style="text-align: center; color: #666; margin-bottom: 15px;">
             <strong>📝 Digite a palavra abaixo:</strong>
         </p>
 
-        <div class="word-display" id="wordDisplay">palavra</div>
+        <div class="word-display" id="wordDisplay" role="status" aria-live="assertive">palavra</div>
 
         <div class="input-section">
             <input 
@@ -67,8 +71,9 @@
                 id="wordInput" 
                 placeholder="Digite aqui e pressione Enter..." 
                 autocomplete="off"
+                aria-label="Campo de entrada para digitar a palavra"
             >
-            <button class="hint-btn" id="hintBtn" onclick="showHint()">💡 Dica</button>
+            <button class="hint-btn" id="hintBtn" onclick="showHint()" aria-label="Mostrar dica da palavra">💡 Dica</button>
         </div>
 
         <p style="text-align: center; color: #666; font-size: 0.95em;">
@@ -77,21 +82,21 @@
     </div>
 
     <!-- Tela de Fim de Jogo -->
-    <div id="overlay" class="overlay"></div>
-    <div id="gameOverScreen" class="game-over-screen">
-        <h2>🎉 Parabéns!</h2>
+    <div id="overlay" class="overlay" role="presentation"></div>
+    <div id="gameOverScreen" class="game-over-screen" role="dialog" aria-labelledby="gameOverTitle">
+        <h2 id="gameOverTitle">🎉 Parabéns!</h2>
         <p style="color: #666; font-size: 1.1em; margin-bottom: 20px;">Você completou o jogo!</p>
 
         <div class="final-stats">
             <p>Pontuação Final: <span class="final-score" id="finalScore">0</span></p>
             <p>Palavras Digitadas: <span id="finalWordsCorrect">0</span></p>
             <p>Precisão: <span class="accuracy" id="finalAccuracy">0</span>%</p>
-            <p>Tempo: <span id="finalTime">0</span>s</p>
+            <p>Tempo: <span id="finalTime">0:00</span></p>
         </div>
 
         <div class="end-buttons">
-            <button class="btn btn-restart" onclick="location.reload()">Jogar Novamente</button>
-            <button class="btn btn-menu" onclick="location.reload()">Voltar ao Menu</button>
+            <button class="btn btn-restart" onclick="startGame('" id="restartBtn" aria-label="Jogar novamente no mesmo nível">Jogar Novamente</button>
+            <button class="btn btn-menu" onclick="goToMenu()" aria-label="Voltar ao menu principal">Voltar ao Menu</button>
         </div>
     </div>
 
