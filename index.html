@@ -11,20 +11,37 @@
     <div id="menuScreen" class="menu-screen">
         <h1>🎮 KeyMaster Kids</h1>
         <p class="subtitle">Aprenda a digitar brincando!</p>
-        <p style="color: #999; margin-bottom: 30px;">Escolha seu nível de dificuldade</p>
-        <div class="difficulty-buttons">
-            <button class="difficulty-btn easy" onclick="startGame('easy')" aria-label="Iniciar jogo no nível Fácil">
-                ⭐ Fácil
-            </button>
-            <button class="difficulty-btn medium" onclick="startGame('medium')" aria-label="Iniciar jogo no nível Médio">
-                ⭐⭐ Médio
-            </button>
-            <button class="difficulty-btn hard" onclick="startGame('hard')" aria-label="Iniciar jogo no nível Difícil">
-                ⭐⭐⭐ Difícil
-            </button>
+        <p style="color: #999; margin-bottom: 30px;">Escolha seu modo de jogo</p>
+        
+        <!-- Seção de Desafios -->
+        <div class="menu-section">
+            <h3 style="color: #667eea; margin-bottom: 15px;">🎯 Desafios de Palavras</h3>
+            <div class="difficulty-buttons">
+                <button class="difficulty-btn easy" onclick="startGame('easy')" aria-label="Iniciar jogo no nível Fácil">
+                    ⭐ Fácil
+                </button>
+                <button class="difficulty-btn medium" onclick="startGame('medium')" aria-label="Iniciar jogo no nível Médio">
+                    ⭐⭐ Médio
+                </button>
+                <button class="difficulty-btn hard" onclick="startGame('hard')" aria-label="Iniciar jogo no nível Difícil">
+                    ⭐⭐⭐ Difícil
+                </button>
+            </div>
         </div>
-        <p style="color: #999; font-size: 0.9em; margin-top: 20px;">
-            💡 Dica: Comece no nível Fácil para aprender!
+
+        <!-- Seção de Alfabeto -->
+        <div class="menu-section">
+            <h3 style="color: #2196F3; margin-bottom: 15px;">🔤 Modo Aprendizado</h3>
+            <button class="difficulty-btn alphabet" onclick="startGame('alphabet')" aria-label="Iniciar modo aprender alfabeto">
+                🔤 Aprender Alfabeto (A-Z)
+            </button>
+            <p style="color: #999; font-size: 0.85em; margin-top: 10px;">
+                Perfeito para iniciantes! Digite as letras de A até Z em ordem.
+            </p>
+        </div>
+
+        <p style="color: #999; font-size: 0.9em; margin-top: 25px;">
+            💡 Dica: Comece com o Alfabeto se for sua primeira vez!
         </p>
     </div>
 
@@ -60,7 +77,7 @@
         <div class="hint-text" id="hintText" role="status" aria-live="polite"></div>
 
         <p style="text-align: center; color: #666; margin-bottom: 15px;">
-            <strong>📝 Digite a palavra abaixo:</strong>
+            <strong>📝 Digite o item abaixo:</strong>
         </p>
 
         <div class="word-display" id="wordDisplay" role="status" aria-live="assertive">palavra</div>
@@ -71,13 +88,13 @@
                 id="wordInput" 
                 placeholder="Digite aqui e pressione Enter..." 
                 autocomplete="off"
-                aria-label="Campo de entrada para digitar a palavra"
+                aria-label="Campo de entrada para digitar"
             >
-            <button class="hint-btn" id="hintBtn" onclick="showHint()" aria-label="Mostrar dica da palavra">💡 Dica</button>
+            <button class="hint-btn" id="hintBtn" onclick="showHint()" aria-label="Mostrar dica">💡 Dica</button>
         </div>
 
         <p style="text-align: center; color: #666; font-size: 0.95em;">
-            <span id="wordCount">0</span> palavras digitadas • <span id="accuracy">0</span>% de precisão
+            <span id="wordCount">0</span> digitados • <span id="accuracy">0</span>% de precisão
         </p>
     </div>
 
@@ -89,7 +106,7 @@
 
         <div class="final-stats">
             <p>Pontuação Final: <span class="final-score" id="finalScore">0</span></p>
-            <p>Palavras Digitadas: <span id="finalWordsCorrect">0</span></p>
+            <p>Itens Digitados: <span id="finalWordsCorrect">0</span></p>
             <p>Precisão: <span class="accuracy" id="finalAccuracy">0</span>%</p>
             <p>Tempo: <span id="finalTime">0:00</span></p>
         </div>

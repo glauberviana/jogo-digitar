@@ -417,6 +417,39 @@ body {
     }
 }
 
+/* ===== SEÇÕES DO MENU ===== */
+.menu-section {
+    margin-bottom: 30px;
+    padding-bottom: 30px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.menu-section:last-of-type {
+    border-bottom: none;
+}
+
+.menu-section h3 {
+    font-size: 1.3em;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.difficulty-btn.alphabet {
+    background: linear-gradient(135deg, #2196F3 0%, #1976d2 100%);
+    color: white;
+    width: 100%;
+    padding: 25px;
+    font-size: 1.15em;
+}
+
+.difficulty-btn.alphabet:hover,
+.difficulty-btn.alphabet:focus {
+    background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+    outline: none;
+}
+
 /* ===== RESPONSIVIDADE ===== */
 @media (max-width: 768px) {
     .menu-screen, .game-container {

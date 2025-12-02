@@ -17,6 +17,12 @@ const GAME_CONFIG = {
         initialLives: 3, 
         multiplier: 2,
         wordGoal: 25
+    },
+    alphabet: {
+        timeLimit: 120,
+        initialLives: 3,
+        multiplier: 0.5,
+        wordGoal: 26
     }
 };
 
@@ -25,6 +31,9 @@ const WORD_LISTS = {
     medium: ["python", "javascript", "computador", "teclado", "mouse", "escola", "livro", "caneta", "professora", "amigo", "diversão", "tecnologia", "internet", "programa", "desenvolvimento"],
     hard: ["programação", "inteligência", "criatividade", "estratégia", "desenvolvimento", "conhecimento", "responsabilidade", "dedicação", "persistência", "excelência", "algoritmo", "estrutura", "otimização"]
 };
+
+// Alfabeto gerado dinamicamente
+const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
 const SCORE_BASE = 10;
 const HINT_PENALTY = 0;
@@ -41,12 +50,13 @@ let timeRemaining = 0;
 let startTime = 0;
 let hintUsed = false;
 let timerInterval = null;
+let currentLetterIndex = 0; // Para modo alfabeto
 
 // ===== FUNÇÕES PRINCIPAIS =====
 
 /**
  * Inicia um novo jogo com a dificuldade selecionada
- * @param {string} difficulty - 'easy', 'medium' ou 'hard'
+ * @param {string} difficulty - 'easy', 'medium', 'hard' ou 'alphabet'
  */
 function startGame(difficulty) {
     if (!difficulty || !GAME_CONFIG[difficulty]) {
@@ -62,6 +72,7 @@ function startGame(difficulty) {
     timeRemaining = GAME_CONFIG[difficulty].timeLimit;
     gameActive = true;
     hintUsed = false;
+    currentLetterIndex = 0;
     startTime = Date.now();
 
     // Limpar timer anterior se existir
@@ -81,16 +92,29 @@ function startGame(difficulty) {
 }
 
 /**
- * Gera uma nova palavra aleatória do nível atual
+ * Gera uma nova palavra aleatória do nível atual (ou próxima letra do alfabeto)
  */
 function generateNewWord() {
-    const words = WORD_LISTS[currentDifficulty];
-    if (!words || words.length === 0) {
-        console.error('Lista de palavras vazia para:', currentDifficulty);
-        return;
+    let words;
+
+    if (currentDifficulty === 'alphabet') {
+        // Para modo alfabeto, usa a próxima letra em sequência
+        if (currentLetterIndex < ALPHABET.length) {
+            currentWord = ALPHABET[currentLetterIndex];
+        } else {
+            currentWord = ALPHABET[0];
+            currentLetterIndex = 0;
+        }
+    } else {
+        // Para outros modos, escolhe uma palavra aleatória
+        words = WORD_LISTS[currentDifficulty];
+        if (!words || words.length === 0) {
+            console.error('Lista de palavras vazia para:', currentDifficulty);
+            return;
+        }
+        currentWord = words[Math.floor(Math.random() * words.length)];
     }
 
-    currentWord = words[Math.floor(Math.random() * words.length)];
     const display = document.getElementById('wordDisplay');
     display.textContent = currentWord;
     display.className = 'word-display';
@@ -124,6 +148,11 @@ function handleInput(e) {
         score += Math.round(SCORE_BASE * GAME_CONFIG[currentDifficulty].multiplier);
         wordsCorrect++;
         showSuccess();
+        
+        // Incrementar índice do alfabeto se estiver no modo alfabeto
+        if (currentDifficulty === 'alphabet') {
+            currentLetterIndex++;
+        }
         
         // Verificar se atingiu a meta de palavras
         if (wordsCorrect >= GAME_CONFIG[currentDifficulty].wordGoal) {
@@ -174,8 +203,19 @@ function showHint() {
     document.getElementById('hintBtn').disabled = true;
 
     const word = currentWord;
-    const hintLength = Math.ceil(word.length / 2);
-    const hint = word.substring(0, hintLength) + '_'.repeat(word.length - hintLength);
+    let hint;
+
+    if (currentDifficulty === 'alphabet') {
+        // Para alfabeto, mostra a letra anterior e próxima
+        const index = ALPHABET.indexOf(word);
+        const prev = index > 0 ? ALPHABET[index - 1] : '?';
+        const next = index < ALPHABET.length - 1 ? ALPHABET[index + 1] : '?';
+        hint = `Entre ${prev} e ${next}`;
+    } else {
+        // Para palavras, mostra primeira metade
+        const hintLength = Math.ceil(word.length / 2);
+        hint = word.substring(0, hintLength) + '_'.repeat(word.length - hintLength);
+    }
 
     const hintEl = document.getElementById('hintText');
     hintEl.textContent = `💡 Dica: ${hint}`;
@@ -213,7 +253,8 @@ function updateDifficultyDisplay() {
     const diffNames = { 
         easy: '⭐ Fácil', 
         medium: '⭐⭐ Médio', 
-        hard: '⭐⭐⭐ Difícil' 
+        hard: '⭐⭐⭐ Difícil',
+        alphabet: '🔤 Aprender Alfabeto'
     };
     document.getElementById('difficulty').textContent = diffNames[currentDifficulty];
 }
